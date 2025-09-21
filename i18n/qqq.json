@@ -1,1 +1,8 @@
-{\n\t\"@metadata\": {\n\t\t\"authors\": [\n\t\t\t\"Your Name\"\n\t\t]\n\t},\n\t\"paragraphlinks-copy-link\": \"Message documentation for copy link tooltip\",\n\t\"paragraphlinks-copied\": \"Success message when link is copied to clipboard\",\n\t\"paragraphlinks-copy-failed\": \"Error message when copying fails\"\n}
+{
+  "@metadata": {
+    "authors": ["Luca Mauri"]
+  },
+  "paragraphlinks-copy-link": "Message documentation for copy link tooltip",
+  "paragraphlinks-copied": "Success message when link is copied to clipboard",
+  "paragraphlinks-copy-failed": "Error message when copying fails"
+}

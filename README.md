@@ -1,1 +1,184 @@
-# ParagraphLinks MediaWiki Extension\n\n**ParagraphLinks** is a MediaWiki extension that adds hover link icons to paragraphs, allowing users to easily copy direct links to specific content within wiki pages without needing to inspect the page source or manually add anchors.\n\n## Features\n\n- **Hover Link Icons**: Shows a link icon (🔗) when hovering over paragraphs\n- **Automatic Anchor Generation**: Creates meaningful anchor IDs based on paragraph content\n- **One-Click Copy**: Click the link icon to copy the full URL with anchor to clipboard\n- **Mobile Friendly**: Adapts to touch devices where hover isn't available\n- **Accessible**: Full keyboard navigation and screen reader support\n- **Configurable**: Enable/disable per namespace and global settings\n- **No Database Changes**: Pure client-side implementation with no schema modifications\n\n## Installation\n\n1. **Download the extension:**\n   ```bash\n   cd extensions/\n   git clone https://github.com/yourusername/mediawiki-extension-paragraphlinks.git ParagraphLinks\n   ```\n\n2. **Add to LocalSettings.php:**\n   ```php\n   wfLoadExtension( 'ParagraphLinks' );\n   ```\n\n3. **Update your MediaWiki installation:**\n   ```bash\n   php maintenance/update.php\n   ```\n\n## Configuration\n\nThe extension provides several configuration options:\n\n```php\n// Enable or disable the extension globally (default: true)\n$wgParagraphLinksEnabled = true;\n\n// Namespaces where paragraph links are enabled\n// Default: [0, 4, 10, 12, 14] (Main, Project, Template, Help, Category)\n$wgParagraphLinksNamespaces = [\n    NS_MAIN,        // 0 - Main namespace\n    NS_PROJECT,     // 4 - Project namespace  \n    NS_TEMPLATE,    // 10 - Template namespace\n    NS_HELP,        // 12 - Help namespace\n    NS_CATEGORY     // 14 - Category namespace\n];\n```\n\n## How It Works\n\n1. **Automatic Detection**: The extension scans all paragraphs in the main content area\n2. **Anchor Generation**: Creates unique anchor IDs based on the first few words of each paragraph\n3. **Visual Feedback**: Shows a link icon on hover (always visible on mobile)\n4. **Clipboard Integration**: Uses modern Clipboard API with fallback for older browsers\n5. **User Notification**: Shows success/error messages when copying links\n\n## Browser Support\n\n- **Modern Browsers**: Full support with Clipboard API\n- **Older Browsers**: Fallback using `document.execCommand`\n- **Mobile Devices**: Touch-optimized interface\n- **Accessibility**: Screen reader and keyboard navigation support\n\n## File Structure\n\n```\nParagraphLinks/\n├── extension.json              # Extension configuration\n├── includes/\n│   └── ParagraphLinksHooks.php # Server-side hooks\n├── resources/\n│   ├── ext.paragraphlinks.js   # Client-side JavaScript\n│   └── ext.paragraphlinks.css  # Styles\n├── i18n/\n│   ├── en.json                 # English messages\n│   └── qqq.json                # Message documentation\n├── tests/\n│   └── phpunit/\n│       └── ParagraphLinksHooksTest.php # Unit tests\n├── README.md\n└── LICENSE\n```\n\n## Development\n\n### Requirements\n\n- MediaWiki 1.35.0 or higher\n- PHP 7.4 or higher\n- Modern browser with JavaScript enabled\n\n### Running Tests\n\n```bash\n# Run PHPUnit tests\nphp tests/phpunit/phpunit.php extensions/ParagraphLinks/tests/phpunit/\n\n# Run with coverage\nphp tests/phpunit/phpunit.php --coverage-html coverage extensions/ParagraphLinks/tests/phpunit/\n```\n\n### Development Setup\n\n1. Clone the repository into your MediaWiki `extensions/` directory\n2. Enable developer mode in MediaWiki:\n   ```php\n   $wgShowExceptionDetails = true;\n   $wgDevelopmentWarnings = true;\n   $wgShowDBErrorBacktrace = true;\n   ```\n3. Disable caching during development:\n   ```php\n   $wgMainCacheType = CACHE_NONE;\n   $wgCacheDirectory = false;\n   ```\n\n## Contributing\n\n1. Fork the repository\n2. Create a feature branch: `git checkout -b feature/your-feature`\n3. Make your changes and add tests\n4. Ensure all tests pass\n5. Submit a pull request\n\n### Code Standards\n\n- Follow [MediaWiki coding conventions]\n- Use tabs for indentation in PHP, spaces in JavaScript/CSS\n- Add PHPDoc comments for all public methods\n- Write unit tests for new functionality\n- Ensure accessibility compliance\n\n## Security Considerations\n\n- The extension only operates on the client-side\n- No user input is processed server-side\n- Generated anchor IDs are sanitized\n- No database modifications are made\n- Uses secure clipboard API when available\n\n## Troubleshooting\n\n**Link icons not appearing:**\n- Check that the extension is enabled in configuration\n- Verify the current page's namespace is in `$wgParagraphLinksNamespaces`\n- Ensure JavaScript is enabled in your browser\n\n**Copy to clipboard not working:**\n- Modern browsers require HTTPS for clipboard access\n- Check browser console for JavaScript errors\n- Verify clipboard permissions are granted\n\n**Performance issues:**\n- The extension only processes paragraphs with substantial content (>10 characters)\n- Client-side processing is minimal and cached\n- No server-side performance impact\n\n## License\n\nThis extension is licensed under the GPL-2.0-or-later license. See the [LICENSE] file for details.\n\n## Changelog\n\n### Version 1.0.0\n- Initial release\n- Hover link icons for paragraphs\n- Automatic anchor generation\n- Clipboard integration\n- Mobile support\n- Accessibility features\n- Configurable namespaces\n\n## Links\n\n- [MediaWiki Extension Documentation]\n- [Issue Tracker]\n- [Source Code]\n\n[MediaWiki coding conventions]: https://www.mediawiki.org/wiki/Manual:Coding_conventions\n[LICENSE]: LICENSE\n[MediaWiki Extension Documentation]: https://www.mediawiki.org/wiki/Manual:Extensions\n[Issue Tracker]: https://github.com/yourusername/mediawiki-extension-paragraphlinks/issues\n[Source Code]: https://github.com/yourusername/mediawiki-extension-paragraphlinks
+# ParagraphLinks MediaWiki Extension
+**ParagraphLinks** is a MediaWiki extension that adds hover link icons to paragraphs, allowing users to easily copy direct links to specific content within wiki pages without needing to inspect the page source or manually add anchors.
+
+## Features
+- **Hover Link Icons**: Shows a link icon (🔗) when hovering over paragraphs
+- **Automatic Anchor Generation**: Creates meaningful anchor IDs based on paragraph content
+- **One-Click Copy**: Click the link icon to copy the full URL with anchor to clipboard
+- **Mobile Friendly**: Adapts to touch devices where hover isn't available
+- **Accessible**: Full keyboard navigation and screen reader support
+- **Configurable**: Enable/disable per namespace and global settings
+- **No Database Changes**: Pure client-side implementation with no schema modifications
+
+## Installation
+
+1. **Download the extension:**
+   ```bash
+   cd extensions/
+   git clone https://github.com/yourusername/mediawiki-extension-paragraphlinks.git ParagraphLinks
+   ```
+
+2. **Add to LocalSettings.php:**
+   ```php
+   wfLoadExtension( 'ParagraphLinks' );
+   ```
+
+3. **Update your MediaWiki installation:**
+   ```bash
+   php maintenance/update.php
+   ```
+
+## Configuration
+
+The extension provides several configuration options:
+
+```php
+// Enable or disable the extension globally (default: true)
+$wgParagraphLinksEnabled = true;
+
+// Namespaces where paragraph links are enabled
+// Default: [0, 4, 10, 12, 14] (Main, Project, Template, Help, Category)
+$wgParagraphLinksNamespaces = [
+    NS_MAIN,        // 0 - Main namespace
+    NS_PROJECT,     // 4 - Project namespace  
+    NS_TEMPLATE,    // 10 - Template namespace
+    NS_HELP,        // 12 - Help namespace
+    NS_CATEGORY     // 14 - Category namespace
+];
+```
+
+## How It Works
+
+1. **Automatic Detection**: The extension scans all paragraphs in the main content area
+2. **Anchor Generation**: Creates unique anchor IDs based on the first few words of each paragraph
+3. **Visual Feedback**: Shows a link icon on hover (always visible on mobile)
+4. **Clipboard Integration**: Uses modern Clipboard API with fallback for older browsers
+5. **User Notification**: Shows success/error messages when copying links
+
+## Browser Support
+
+- **Modern Browsers**: Full support with Clipboard API
+- **Older Browsers**: Fallback using `document.execCommand`
+- **Mobile Devices**: Touch-optimized interface
+- **Accessibility**: Screen reader and keyboard navigation support
+
+## File Structure
+
+```
+ParagraphLinks/
+├── extension.json              # Extension configuration
+├── includes/
+│   └── ParagraphLinksHooks.php # Server-side hooks
+├── resources/
+│   ├── ext.paragraphlinks.js   # Client-side JavaScript
+│   └── ext.paragraphlinks.css  # Styles
+├── i18n/
+│   ├── en.json                 # English messages
+│   └── qqq.json                # Message documentation
+├── tests/
+│   └── phpunit/
+│       └── ParagraphLinksHooksTest.php # Unit tests
+├── README.md
+└── LICENSE
+```
+
+## Development
+
+### Requirements
+
+- MediaWiki 1.35.0 or higher
+- PHP 7.4 or higher
+- Modern browser with JavaScript enabled
+
+### Running Tests
+
+```bash
+# Run PHPUnit tests
+php tests/phpunit/phpunit.php extensions/ParagraphLinks/tests/phpunit/
+
+# Run with coverage
+php tests/phpunit/phpunit.php --coverage-html coverage extensions/ParagraphLinks/tests/phpunit/
+```
+
+### Development Setup
+
+1. Clone the repository into your MediaWiki `extensions/` directory
+2. Enable developer mode in MediaWiki:
+   ```php
+   $wgShowExceptionDetails = true;
+   $wgDevelopmentWarnings = true;
+   $wgShowDBErrorBacktrace = true;
+   ```
+3. Disable caching during development:
+   ```php
+   $wgMainCacheType = CACHE_NONE;
+   $wgCacheDirectory = false;
+   ```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Make your changes and add tests
+4. Ensure all tests pass
+5. Submit a pull request
+
+### Code Standards
+
+- Follow [MediaWiki coding conventions]
+- Use tabs for indentation in PHP, spaces in JavaScript/CSS
+- Add PHPDoc comments for all public methods
+- Write unit tests for new functionality
+- Ensure accessibility compliance
+
+## Security Considerations
+
+- The extension only operates on the client-side
+- No user input is processed server-side
+- Generated anchor IDs are sanitized
+- No database modifications are made
+- Uses secure clipboard API when available
+
+## Troubleshooting
+
+**Link icons not appearing:**
+- Check that the extension is enabled in configuration
+- Verify the current page's namespace is in `$wgParagraphLinksNamespaces`
+- Ensure JavaScript is enabled in your browser
+
+**Copy to clipboard not working:**
+- Modern browsers require HTTPS for clipboard access
+- Check browser console for JavaScript errors
+- Verify clipboard permissions are granted
+
+**Performance issues:**
+- The extension only processes paragraphs with substantial content (>10 characters)
+- Client-side processing is minimal and cached
+- No server-side performance impact
+
+## License
+
+This extension is licensed under the GPL-2.0-or-later license. See the [LICENSE] file for details.
+
+## Changelog
+
+### Version 1.0.0
+- Initial release
+- Hover link icons for paragraphs
+- Automatic anchor generation
+- Clipboard integration
+- Mobile support
+- Accessibility features
+- Configurable namespaces
+
+## Links
+
+- [MediaWiki Extension Documentation]
+- [Issue Tracker]
+- [Source Code]
+
+[MediaWiki coding conventions]: https://www.mediawiki.org/wiki/Manual:Coding_conventions
+[LICENSE]: LICENSE
+[MediaWiki Extension Documentation]: https://www.mediawiki.org/wiki/Manual:Extensions
+[Issue Tracker]: https://github.com/yourusername/mediawiki-extension-paragraphlinks/issues
+[Source Code]: https://github.com/yourusername/mediawiki-extension-paragraphlinks

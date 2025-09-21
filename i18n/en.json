@@ -1,1 +1,8 @@
-{\n\t\"@metadata\": {\n\t\t\"authors\": [\n\t\t\t\"Your Name\"\n\t\t]\n\t},\n\t\"paragraphlinks-copy-link\": \"Copy link to this paragraph\",\n\t\"paragraphlinks-copied\": \"Link copied to clipboard!\",\n\t\"paragraphlinks-copy-failed\": \"Failed to copy link. Please try again.\"\n}
+{
+  "@metadata": {
+    "authors": ["Luca Mauri"]
+  },
+  "paragraphlinks-copy-link": "Copy link to this paragraph",
+  "paragraphlinks-copied": "Link copied to clipboard!",
+  "paragraphlinks-copy-failed": "Failed to copy link. Please try again."
+}

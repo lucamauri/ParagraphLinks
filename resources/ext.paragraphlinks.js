@@ -1,1 +1,206 @@
-/**\n * ParagraphLinks extension - Client-side functionality\n * Adds hover link icons to paragraphs for easy copying of direct links\n *\n * @license GPL-2.0-or-later\n */\n\n( function () {\n\t'use strict';\n\n\tconst util = require( 'mediawiki.util' );\n\n\t/**\n\t * Generate a unique anchor ID for a paragraph\n\t * @param {Element} paragraph The paragraph element\n\t * @param {number} index The paragraph index\n\t * @return {string} Unique anchor ID\n\t */\n\tfunction generateAnchorId( paragraph, index ) {\n\t\t// Try to get meaningful text from the paragraph\n\t\tconst text = paragraph.textContent.trim();\n\t\t\n\t\tif ( text.length > 0 ) {\n\t\t\t// Create a slug from the first few words\n\t\t\tconst words = text.split( /\\s+/ ).slice( 0, 5 );\n\t\t\tconst slug = words.join( '-' )\n\t\t\t\t.toLowerCase()\n\t\t\t\t.replace( /[^a-z0-9\\-]/g, '' )\n\t\t\t\t.replace( /-+/g, '-' )\n\t\t\t\t.replace( /^-|-$/g, '' );\n\t\t\t\n\t\t\tif ( slug.length > 0 ) {\n\t\t\t\treturn 'p-' + slug;\n\t\t\t}\n\t\t}\n\t\t\n\t\t// Fallback to paragraph index\n\t\treturn 'p-' + index;\n\t}\n\n\t/**\n\t * Copy text to clipboard\n\t * @param {string} text Text to copy\n\t * @return {Promise<boolean>} Success status\n\t */\n\tasync function copyToClipboard( text ) {\n\t\ttry {\n\t\t\tif ( navigator.clipboard && navigator.clipboard.writeText ) {\n\t\t\t\tawait navigator.clipboard.writeText( text );\n\t\t\t\treturn true;\n\t\t\t}\n\t\t\t\n\t\t\t// Fallback for older browsers\n\t\t\tconst textArea = document.createElement( 'textarea' );\n\t\t\ttextArea.value = text;\n\t\t\ttextArea.style.position = 'fixed';\n\t\t\ttextArea.style.opacity = '0';\n\t\t\tdocument.body.appendChild( textArea );\n\t\t\ttextArea.focus();\n\t\t\ttextArea.select();\n\t\t\t\n\t\t\tconst successful = document.execCommand( 'copy' );\n\t\t\tdocument.body.removeChild( textArea );\n\t\t\t\n\t\t\treturn successful;\n\t\t} catch ( err ) {\n\t\t\tconsole.error( 'Failed to copy text: ', err );\n\t\t\treturn false;\n\t\t}\n\t}\n\n\t/**\n\t * Show a temporary notification\n\t * @param {string} message Message to show\n\t * @param {string} type Notification type ('success' or 'error')\n\t */\n\tfunction showNotification( message, type ) {\n\t\tif ( typeof mw.notify === 'function' ) {\n\t\t\tmw.notify( message, { type: type } );\n\t\t} else {\n\t\t\t// Fallback notification\n\t\t\tconst notification = document.createElement( 'div' );\n\t\t\tnotification.textContent = message;\n\t\t\tnotification.className = 'paragraphlinks-notification paragraphlinks-notification-' + type;\n\t\t\tnotification.style.cssText = `\n\t\t\t\tposition: fixed;\n\t\t\t\ttop: 20px;\n\t\t\t\tright: 20px;\n\t\t\t\tpadding: 10px 15px;\n\t\t\t\tbackground: ${type === 'success' ? '#00af89' : '#d73527'};\n\t\t\t\tcolor: white;\n\t\t\t\tborder-radius: 4px;\n\t\t\t\tz-index: 10000;\n\t\t\t\tfont-size: 14px;\n\t\t\t`;\n\t\t\t\n\t\t\tdocument.body.appendChild( notification );\n\t\t\t\n\t\t\tsetTimeout( function () {\n\t\t\t\tif ( notification.parentNode ) {\n\t\t\t\t\tnotification.parentNode.removeChild( notification );\n\t\t\t\t}\n\t\t\t}, 3000 );\n\t\t}\n\t}\n\n\t/**\n\t * Create and configure the link icon element\n\t * @param {string} anchorId The anchor ID to link to\n\t * @return {Element} The link icon element\n\t */\n\tfunction createLinkIcon( anchorId ) {\n\t\tconst linkIcon = document.createElement( 'a' );\n\t\tlinkIcon.href = '#' + anchorId;\n\t\tlinkIcon.className = 'paragraphlinks-icon';\n\t\tlinkIcon.setAttribute( 'aria-label', mw.msg( 'paragraphlinks-copy-link' ) );\n\t\tlinkIcon.setAttribute( 'title', mw.msg( 'paragraphlinks-copy-link' ) );\n\t\tlinkIcon.innerHTML = '🔗';\n\t\t\n\t\tlinkIcon.addEventListener( 'click', function ( e ) {\n\t\t\te.preventDefault();\n\t\t\t\n\t\t\tconst fullUrl = window.location.protocol + '//' + window.location.host + \n\t\t\t\t\t\t   window.location.pathname + window.location.search + '#' + anchorId;\n\t\t\t\n\t\t\tcopyToClipboard( fullUrl ).then( function ( success ) {\n\t\t\t\tif ( success ) {\n\t\t\t\t\tshowNotification( mw.msg( 'paragraphlinks-copied' ), 'success' );\n\t\t\t\t} else {\n\t\t\t\t\tshowNotification( mw.msg( 'paragraphlinks-copy-failed' ), 'error' );\n\t\t\t\t}\n\t\t\t} );\n\t\t} );\n\t\t\n\t\treturn linkIcon;\n\t}\n\n\t/**\n\t * Initialize paragraph links functionality\n\t */\n\tfunction init() {\n\t\t// Find all paragraphs in the main content area\n\t\tconst contentArea = document.querySelector( '#mw-content-text' ) || \n\t\t\t\t\t\t   document.querySelector( '.mw-parser-output' ) ||\n\t\t\t\t\t\t   document.querySelector( '#content' );\n\t\t\n\t\tif ( !contentArea ) {\n\t\t\treturn;\n\t\t}\n\n\t\tconst paragraphs = contentArea.querySelectorAll( 'p' );\n\t\tconst existingIds = new Set();\n\t\t\n\t\t// Collect existing IDs to avoid conflicts\n\t\tdocument.querySelectorAll( '[id]' ).forEach( function ( element ) {\n\t\t\texistingIds.add( element.id );\n\t\t} );\n\n\t\tparagraphs.forEach( function ( paragraph, index ) {\n\t\t\t// Skip empty paragraphs or paragraphs with very little content\n\t\t\tif ( paragraph.textContent.trim().length < 10 ) {\n\t\t\t\treturn;\n\t\t\t}\n\t\t\t\n\t\t\t// Skip if paragraph already has an ID\n\t\t\tif ( paragraph.id ) {\n\t\t\t\treturn;\n\t\t\t}\n\t\t\t\n\t\t\t// Generate unique anchor ID\n\t\t\tlet anchorId = generateAnchorId( paragraph, index );\n\t\t\tlet counter = 1;\n\t\t\t\n\t\t\t// Ensure uniqueness\n\t\t\twhile ( existingIds.has( anchorId ) ) {\n\t\t\t\tanchorId = generateAnchorId( paragraph, index ) + '-' + counter;\n\t\t\t\tcounter++;\n\t\t\t}\n\t\t\t\n\t\t\texistingIds.add( anchorId );\n\t\t\t\n\t\t\t// Add anchor to paragraph\n\t\t\tparagraph.id = anchorId;\n\t\t\t\n\t\t\t// Create wrapper div for the paragraph and link icon\n\t\t\tconst wrapper = document.createElement( 'div' );\n\t\t\twrapper.className = 'paragraphlinks-wrapper';\n\t\t\t\n\t\t\t// Move paragraph into wrapper\n\t\t\tparagraph.parentNode.insertBefore( wrapper, paragraph );\n\t\t\twrapper.appendChild( paragraph );\n\t\t\t\n\t\t\t// Create and add link icon\n\t\t\tconst linkIcon = createLinkIcon( anchorId );\n\t\t\twrapper.appendChild( linkIcon );\n\t\t} );\n\t}\n\n\t// Initialize when DOM is ready\n\tif ( document.readyState === 'loading' ) {\n\t\tdocument.addEventListener( 'DOMContentLoaded', init );\n\t} else {\n\t\tinit();\n\t}\n\n}() );
+/**
+ * ParagraphLinks extension - Client-side functionality
+ * Adds hover link icons to paragraphs for easy copying of direct links
+ *
+ * @license GPL-2.0-or-later
+ */
+
+( function () {
+	'use strict';
+
+	const util = require( 'mediawiki.util' );
+
+	/**
+	 * Generate a unique anchor ID for a paragraph
+	 * @param {Element} paragraph The paragraph element
+	 * @param {number} index The paragraph index
+	 * @return {string} Unique anchor ID
+	 */
+	function generateAnchorId( paragraph, index ) {
+		// Try to get meaningful text from the paragraph
+		const text = paragraph.textContent.trim();
+		
+		if ( text.length > 0 ) {
+			// Create a slug from the first few words
+			const words = text.split( /\\s+/ ).slice( 0, 5 );
+			const slug = words.join( '-' )
+				.toLowerCase()
+				.replace( /[^a-z0-9\\-]/g, '' )
+				.replace( /-+/g, '-' )
+				.replace( /^-|-$/g, '' );
+			
+			if ( slug.length > 0 ) {
+				return 'p-' + slug;
+			}
+		}
+		
+		// Fallback to paragraph index
+		return 'p-' + index;
+	}
+
+	/**
+	 * Copy text to clipboard
+	 * @param {string} text Text to copy
+	 * @return {Promise<boolean>} Success status
+	 */
+	async function copyToClipboard( text ) {
+		try {
+			if ( navigator.clipboard && navigator.clipboard.writeText ) {
+				await navigator.clipboard.writeText( text );
+				return true;
+			}
+			
+			// Fallback for older browsers
+			const textArea = document.createElement( 'textarea' );
+			textArea.value = text;
+			textArea.style.position = 'fixed';
+			textArea.style.opacity = '0';
+			document.body.appendChild( textArea );
+			textArea.focus();
+			textArea.select();
+			
+			const successful = document.execCommand( 'copy' );
+			document.body.removeChild( textArea );
+			
+			return successful;
+		} catch ( err ) {
+			console.error( 'Failed to copy text: ', err );
+			return false;
+		}
+	}
+
+	/**
+	 * Show a temporary notification
+	 * @param {string} message Message to show
+	 * @param {string} type Notification type ('success' or 'error')
+	 */
+	function showNotification( message, type ) {
+		if ( typeof mw.notify === 'function' ) {
+			mw.notify( message, { type: type } );
+		} else {
+			// Fallback notification
+			const notification = document.createElement( 'div' );
+			notification.textContent = message;
+			notification.className = 'paragraphlinks-notification paragraphlinks-notification-' + type;
+			notification.style.cssText = `
+				position: fixed;
+				top: 20px;
+				right: 20px;
+				padding: 10px 15px;
+				background: ${type === 'success' ? '#00af89' : '#d73527'};
+				color: white;
+				border-radius: 4px;
+				z-index: 10000;
+				font-size: 14px;
+			`;
+			
+			document.body.appendChild( notification );
+			
+			setTimeout( function () {
+				if ( notification.parentNode ) {
+					notification.parentNode.removeChild( notification );
+				}
+			}, 3000 );
+		}
+	}
+
+	/**
+	 * Create and configure the link icon element
+	 * @param {string} anchorId The anchor ID to link to
+	 * @return {Element} The link icon element
+	 */
+	function createLinkIcon( anchorId ) {
+		const linkIcon = document.createElement( 'a' );
+		linkIcon.href = '#' + anchorId;
+		linkIcon.className = 'paragraphlinks-icon';
+		linkIcon.setAttribute( 'aria-label', mw.msg( 'paragraphlinks-copy-link' ) );
+		linkIcon.setAttribute( 'title', mw.msg( 'paragraphlinks-copy-link' ) );
+		linkIcon.innerHTML = '🔗';
+		
+		linkIcon.addEventListener( 'click', function ( e ) {
+			e.preventDefault();
+			
+			const fullUrl = window.location.protocol + '//' + window.location.host + 
+						   window.location.pathname + window.location.search + '#' + anchorId;
+			
+			copyToClipboard( fullUrl ).then( function ( success ) {
+				if ( success ) {
+					showNotification( mw.msg( 'paragraphlinks-copied' ), 'success' );
+				} else {
+					showNotification( mw.msg( 'paragraphlinks-copy-failed' ), 'error' );
+				}
+			} );
+		} );
+		
+		return linkIcon;
+	}
+
+	/**
+	 * Initialize paragraph links functionality
+	 */
+	function init() {
+		// Find all paragraphs in the main content area
+		const contentArea = document.querySelector( '#mw-content-text' ) || 
+						   document.querySelector( '.mw-parser-output' ) ||
+						   document.querySelector( '#content' );
+		
+		if ( !contentArea ) {
+			return;
+		}
+
+		const paragraphs = contentArea.querySelectorAll( 'p' );
+		const existingIds = new Set();
+		
+		// Collect existing IDs to avoid conflicts
+		document.querySelectorAll( '[id]' ).forEach( function ( element ) {
+			existingIds.add( element.id );
+		} );
+
+		paragraphs.forEach( function ( paragraph, index ) {
+			// Skip empty paragraphs or paragraphs with very little content
+			if ( paragraph.textContent.trim().length < 10 ) {
+				return;
+			}
+			
+			// Skip if paragraph already has an ID
+			if ( paragraph.id ) {
+				return;
+			}
+			
+			// Generate unique anchor ID
+			let anchorId = generateAnchorId( paragraph, index );
+			let counter = 1;
+			
+			// Ensure uniqueness
+			while ( existingIds.has( anchorId ) ) {
+				anchorId = generateAnchorId( paragraph, index ) + '-' + counter;
+				counter++;
+			}
+			
+			existingIds.add( anchorId );
+			
+			// Add anchor to paragraph
+			paragraph.id = anchorId;
+			
+			// Create wrapper div for the paragraph and link icon
+			const wrapper = document.createElement( 'div' );
+			wrapper.className = 'paragraphlinks-wrapper';
+			
+			// Move paragraph into wrapper
+			paragraph.parentNode.insertBefore( wrapper, paragraph );
+			wrapper.appendChild( paragraph );
+			
+			// Create and add link icon
+			const linkIcon = createLinkIcon( anchorId );
+			wrapper.appendChild( linkIcon );
+		} );
+	}
+
+	// Initialize when DOM is ready
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', init );
+	} else {
+		init();
+	}
+
+}() );

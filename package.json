@@ -1,1 +1,44 @@
-{\n\t\"name\": \"paragraphlinks\",\n\t\"version\": \"1.0.0\",\n\t\"description\": \"MediaWiki extension that adds hover link icons to paragraphs for easy copying of direct links\",\n\t\"main\": \"resources/ext.paragraphlinks.js\",\n\t\"scripts\": {\n\t\t\"test\": \"echo \\\"Error: no test specified\\\" && exit 1\",\n\t\t\"lint\": \"eslint resources/ext.paragraphlinks.js\",\n\t\t\"lint:fix\": \"eslint resources/ext.paragraphlinks.js --fix\"\n\t},\n\t\"repository\": {\n\t\t\"type\": \"git\",\n\t\t\"url\": \"https://github.com/yourusername/mediawiki-extension-paragraphlinks.git\"\n\t},\n\t\"keywords\": [\n\t\t\"mediawiki\",\n\t\t\"extension\",\n\t\t\"paragraph\",\n\t\t\"links\",\n\t\t\"anchor\",\n\t\t\"clipboard\",\n\t\t\"wiki\"\n\t],\n\t\"author\": \"Your Name\",\n\t\"license\": \"GPL-2.0-or-later\",\n\t\"bugs\": {\n\t\t\"url\": \"https://github.com/yourusername/mediawiki-extension-paragraphlinks/issues\"\n\t},\n\t\"homepage\": \"https://github.com/yourusername/mediawiki-extension-paragraphlinks#readme\",\n\t\"devDependencies\": {\n\t\t\"eslint\": \"^8.0.0\",\n\t\t\"eslint-config-wikimedia\": \"^0.25.0\"\n\t},\n\t\"eslintConfig\": {\n\t\t\"root\": true,\n\t\t\"extends\": [\n\t\t\t\"wikimedia\"\n\t\t],\n\t\t\"env\": {\n\t\t\t\"browser\": true,\n\t\t\t\"es6\": true\n\t\t}\n\t}\n}
+{
+	"name": "paragraphlinks",
+	"version": "1.0.0",
+	"description": "MediaWiki extension that adds hover link icons to paragraphs for easy copying of direct links",
+	"main": "resources/ext.paragraphlinks.js",
+	"scripts": {
+		"test": "echo 'Error: no test specified' && exit 1",
+		"lint": "eslint resources/ext.paragraphlinks.js",
+		"lint:fix": "eslint resources/ext.paragraphlinks.js --fix"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/yourusername/mediawiki-extension-paragraphlinks.git"
+	},
+	"keywords": [
+		"mediawiki",
+		"extension",
+		"paragraph",
+		"links",
+		"anchor",
+		"clipboard",
+		"wiki"
+	],
+	"author": "Your Name",
+	"license": "GPL-3.0-or-later",
+	"bugs": {
+		"url": "https://github.com/yourusername/mediawiki-extension-paragraphlinks/issues"
+	},
+	"homepage": "https://github.com/yourusername/mediawiki-extension-paragraphlinks#readme",
+	"devDependencies": {
+		"eslint": "^8.0.0",
+		"eslint-config-wikimedia": "^0.25.0"
+	},
+	"eslintConfig": {
+		"root": true,
+		"extends": [
+			"wikimedia"
+		],
+		"env": {
+			"browser": true,
+			"es6": true
+		}
+	}
+}
