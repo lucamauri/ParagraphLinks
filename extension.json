@@ -1,0 +1,62 @@
+{
+  "name": "ParagraphLinks",
+  "version": "1.0.0",
+  "author": [
+    "Your Name"
+  ],
+  "url": "https://github.com/yourusername/mediawiki-extension-paragraphlinks",
+  "description": "Adds hover link icons to paragraphs for easy copying of direct links to specific content within wiki pages",
+  "license-name": "GPL-2.0-or-later",
+  "type": "other",
+  "manifest_version": 2,
+  "requires": {
+    "MediaWiki": ">= 1.35.0"
+  },
+  "ResourceModules": {
+    "ext.paragraphlinks": {
+      "localBasePath": "resources",
+      "remoteExtPath": "ParagraphLinks/resources",
+      "packageFiles": [
+        "ext.paragraphlinks.js"
+      ],
+      "styles": [
+        "ext.paragraphlinks.css"
+      ],
+      "dependencies": [
+        "mediawiki.util"
+      ],
+      "messages": [
+        "paragraphlinks-copy-link",
+        "paragraphlinks-copied",
+        "paragraphlinks-copy-failed"
+      ]
+    }
+  },
+  "MessagesDirs": {
+    "ParagraphLinks": [
+      "i18n"
+    ]
+  },
+  "Hooks": {
+    "BeforePageDisplay": "ParagraphLinksHooks::onBeforePageDisplay"
+  },
+  "AutoloadClasses": {
+    "ParagraphLinksHooks": "includes/ParagraphLinksHooks.php"
+  },
+  "config": {
+    "ParagraphLinksEnabled": {
+      "value": true,
+      "description": "Enable paragraph links functionality"
+    },
+    "ParagraphLinksNamespaces": {
+      "value": [
+        0,
+        4,
+        10,
+        12,
+        14
+      ],
+      "description": "Namespaces where paragraph links are enabled (Main, Project, Template, Help, Category by default)"
+    }
+  }
+}
