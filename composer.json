@@ -1,0 +1,26 @@
+{
+  "name": "your-vendor/mediawiki-paragraphlinks",
+  "description": "MediaWiki extension that adds hover link icons to paragraphs, enabling one-click paragraph link copying",
+  "type": "mediawiki-extension",
+  "license": ["GPL-3.0-or-later"],
+  "authors": [
+    {
+      "name": "Luca Mauri",
+      "homepage": "https://github.com/lucamauri/ParagraphLinks"
+    }
+  ],
+  "require": {
+    "composer/installers": "~1.0",
+    "mediawiki/core": ">=1.35.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "MediaWiki\\Extension\\ParagraphLinks\\": "includes/"
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0.x-dev"
+    }
+  }
+}
