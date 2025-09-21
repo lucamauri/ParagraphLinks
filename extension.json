@@ -2,9 +2,9 @@
   "name": "ParagraphLinks",
   "version": "1.0.0",
   "author": ["Luca Mauri"],
-  "url": "https://github.com/yourusername/mediawiki-extension-paragraphlinks",
+  "url": "https://github.com/lucamauri/ParagraphLinks",
   "description": "Adds hover link icons to paragraphs for easy copying of direct links to specific content within wiki pages",
-  "license-name": "GPL-2.0-or-later",
+  "license-name": "GPL-3.0-or-later",
   "type": "other",
   "manifest_version": 2,
   "requires": {
