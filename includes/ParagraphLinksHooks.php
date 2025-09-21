@@ -8,6 +8,12 @@
  * @license GPL-3.0-or-later
  */
 
+namespace MediaWiki\Extension\ParagraphLinks;
+
+use MediaWiki\MediaWikiServices;
+use OutputPage;
+use Skin;
+
 class ParagraphLinksHooks {
 
 	/**
@@ -19,14 +25,14 @@ class ParagraphLinksHooks {
 	 */
 	public static function onBeforePageDisplay( OutputPage $out, Skin $skin ) {
 		$config = MediaWikiServices::getInstance()->getMainConfig();
-		
+
 		// Check if the extension is enabled
 		if ( !$config->get( 'ParagraphLinksEnabled' ) ) {
 			return;
 		}
 
 		$title = $out->getTitle();
-		
+
 		// Check if we're on a valid namespace
 		$enabledNamespaces = $config->get( 'ParagraphLinksNamespaces' );
 		if ( !in_array( $title->getNamespace(), $enabledNamespaces ) ) {

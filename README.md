@@ -12,21 +12,42 @@
 
 ## Installation
 
-1. **Download the extension:**
-   ```bash
-   cd extensions/
-   git clone https://github.com/yourusername/mediawiki-extension-paragraphlinks.git ParagraphLinks
-   ```
+You can install ParagraphLinks in two ways:
 
-2. **Add to LocalSettings.php:**
+**Manual Installation**  
+1. Clone into your `extensions/` directory:  
+   ```bash
+   cd /path/to/mediawiki/extensions/
+   git clone https://github.com/yourusername/mediawiki-extension-paragraphlinks.git ParagraphLinks
+   ```  
+2. Enable the extension in `LocalSettings.php`:  
    ```php
    wfLoadExtension( 'ParagraphLinks' );
-   ```
-
-3. **Update your MediaWiki installation:**
+   ```  
+3. Update your wiki database schema (if prompted):  
    ```bash
    php maintenance/update.php
+   ```  
+
+**Composer Installation (Local without Packagist)**  
+1. in your `composer.local.json` file create or add the following to `require` section:
+   ```json
+   "require": {
+      "lucamauri/paragraphlinks": "~1.0",
+   }
    ```
+   and run
+   ```bash
+   composer update --no-dev
+   ```
+2. Load the extension in `LocalSettings.php`:  
+   ```php
+   wfLoadExtension( 'ParagraphLinks' );
+   ```  
+3. Run schema updates if needed:  
+   ```bash
+   php maintenance/update.php
+   ``` 
 
 ## Configuration
 
@@ -66,18 +87,18 @@ $wgParagraphLinksNamespaces = [
 
 ```
 ParagraphLinks/
-├── extension.json              # Extension configuration
+├── extension.json                        # Extension configuration
 ├── includes/
-│   └── ParagraphLinksHooks.php # Server-side hooks
+│   └── ParagraphLinksHooks.php           # Server-side hooks
 ├── resources/
-│   ├── ext.paragraphlinks.js   # Client-side JavaScript
-│   └── ext.paragraphlinks.css  # Styles
+│   ├── ext.paragraphlinks.js             # Client-side JavaScript
+│   └── ext.paragraphlinks.css            # Styles
 ├── i18n/
-│   ├── en.json                 # English messages
-│   └── qqq.json                # Message documentation
+│   ├── en.json                           # English messages
+│   └── qqq.json                          # Message documentation
 ├── tests/
 │   └── phpunit/
-│       └── ParagraphLinksHooksTest.php # Unit tests
+│       └── ParagraphLinksHooksTest.php   # Unit tests
 ├── README.md
 └── LICENSE
 ```

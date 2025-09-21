@@ -14,7 +14,7 @@
     "ext.paragraphlinks": {
       "localBasePath": "resources",
       "remoteExtPath": "ParagraphLinks/resources",
-      "packageFiles": ["ext.paragraphlinks.js"],
+      "scripts": ["ext.paragraphlinks.js"],
       "styles": ["ext.paragraphlinks.css"],
       "dependencies": ["mediawiki.util"],
       "messages": [
@@ -28,7 +28,7 @@
     "ParagraphLinks": ["i18n"]
   },
   "Hooks": {
-    "BeforePageDisplay": "ParagraphLinksHooks::onBeforePageDisplay"
+    "BeforePageDisplay": "MediaWiki\\Extension\\ParagraphLinks\\ParagraphLinksHooks::onBeforePageDisplay"
   },
   "AutoloadClasses": {
     "ParagraphLinksHooks": "includes/ParagraphLinksHooks.php"
