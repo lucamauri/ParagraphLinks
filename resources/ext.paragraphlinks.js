@@ -36,7 +36,7 @@
                 const url = window.location.href.replace(/#.*/,'') + '#' + headingId;
                 navigator.clipboard.writeText( url )
                     .then( () => {
-                        if ( mw.notify ) mw.notify( 'Link copied!', { tag: 'paragraphlinks' } );
+                        if ( mw.notify ) mw.notify( 'Link copied!', { type: 'success', tag: 'paragraphlinks' } );
                     } )
                     .catch( () => {
                         if ( mw.notify ) mw.notify( 'Copy failed', { type: 'error', tag: 'paragraphlinks' } );
