@@ -1,6 +1,6 @@
 {
   "name": "ParagraphLinks",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": ["Luca Mauri"],
   "url": "https://github.com/lucamauri/ParagraphLinks",
   "description": "Adds hover link icons to paragraphs for easy copying of direct links to specific content within wiki pages",
@@ -31,7 +31,7 @@
     "BeforePageDisplay": "MediaWiki\\Extension\\ParagraphLinks\\ParagraphLinksHooks::onBeforePageDisplay"
   },
   "AutoloadClasses": {
-    "ParagraphLinksHooks": "includes/ParagraphLinksHooks.php"
+    "MediaWiki\\Extension\\ParagraphLinks\\ParagraphLinksHooks": "includes/ParagraphLinksHooks.php"
   },
   "config": {
     "ParagraphLinksEnabled": {
