@@ -28,6 +28,5 @@ h6:hover .paragraphlinks-icon {
 
 /* Icon hover state */
 .paragraphlinks-icon:hover {
-    color: #0645ad;
     text-decoration: none;
 }

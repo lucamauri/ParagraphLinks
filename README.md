@@ -1,5 +1,5 @@
 # ParagraphLinks MediaWiki Extension
-**ParagraphLinks** is a MediaWiki extension that adds hover link icons to paragraphs, allowing users to easily copy direct links to specific content within wiki pages without needing to inspect the page source or manually add anchors.
+**ParagraphLinks** is a [MediaWiki extension][Extension homepage] that adds hover link icons to paragraphs, allowing users to easily copy direct links to specific content within wiki pages without needing to inspect the page source or manually add anchors.
 
 ## Features
 - **Hover Link Icons**: Shows a link icon (🔗) when hovering over paragraphs
@@ -18,7 +18,7 @@ You can install ParagraphLinks in two ways:
 1. Clone into your `extensions/` directory:  
    ```bash
    cd /path/to/mediawiki/extensions/
-   git clone https://github.com/yourusername/mediawiki-extension-paragraphlinks.git ParagraphLinks
+   git clone https://github.com/lucamauri/ParagraphLinks.git ParagraphLinks
    ```  
 2. Enable the extension in `LocalSettings.php`:  
    ```php
@@ -201,5 +201,6 @@ This extension is licensed under the GPL-2.0-or-later license. See the [LICENSE]
 [MediaWiki coding conventions]: https://www.mediawiki.org/wiki/Manual:Coding_conventions
 [LICENSE]: LICENSE
 [MediaWiki Extension Documentation]: https://www.mediawiki.org/wiki/Manual:Extensions
-[Issue Tracker]: https://github.com/yourusername/mediawiki-extension-paragraphlinks/issues
-[Source Code]: https://github.com/yourusername/mediawiki-extension-paragraphlinks
+[Issue Tracker]: https://github.com/lucamauri/ParagraphLinks/issues
+[Source Code]: https://github.com/lucamauri/ParagraphLinks
+[Extension homepage]: https://www.mediawiki.org/wiki/Extension:ParagraphLinks
