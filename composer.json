@@ -12,6 +12,13 @@
   "require": {
     "composer/installers": "^2|^1.0.1"
   },
+  "extra": {
+    "installer-name": "ParagraphLinks"
+  },
+  "config": {
+    "prepend-autoloader": false,
+    "optimize-autoloader": true
+  },
   "autoload": {
     "psr-4": {
       "MediaWiki\\Extension\\ParagraphLinks\\": "includes/"
