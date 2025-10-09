@@ -6,7 +6,7 @@ h2, h3, h4, h5, h6 {
 /* Icon styling */
 .paragraphlinks-icon {
     position: absolute;
-    left: 1.3em;
+    left: -1.3em;
     top: 50%;
     transform: translateY(-50%);
     opacity: 0;
