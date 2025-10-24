@@ -181,17 +181,6 @@ php tests/phpunit/phpunit.php --coverage-html coverage extensions/ParagraphLinks
 
 This extension is licensed under the GPL-2.0-or-later license. See the [LICENSE] file for details.
 
-## Changelog
-
-### Version 1.0.0
-- Initial release
-- Hover link icons for paragraphs
-- Automatic anchor generation
-- Clipboard integration
-- Mobile support
-- Accessibility features
-- Configurable namespaces
-
 ## Links
 
 - [MediaWiki Extension Documentation]
