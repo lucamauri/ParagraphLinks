@@ -1,32 +1,36 @@
-/* Make headings positioning context */
-h2, h3, h4, h5, h6 {
-    position: relative;
+/* Establish positioning context for the icon on content headings only */
+#mw-content-text h2,
+#mw-content-text h3,
+#mw-content-text h4,
+#mw-content-text h5,
+#mw-content-text h6 {
+	position: relative;
 }
 
 /* Icon styling */
 .paragraphlinks-icon {
-    position: absolute;
-    left: -1.3em;
-    top: 50%;
-    transform: translateY(-50%);
-    opacity: 0;
-    transition: opacity .15s ease-in-out;
-    text-decoration: none;
-    font-size: 0.75em;
-    line-height: 1;
-    color: #72777d;
+	position: absolute;
+	left: -1.3em;
+	top: 50%;
+	transform: translateY(-50%);
+	opacity: 0;
+	transition: opacity .15s ease-in-out;
+	text-decoration: none;
+	font-size: 0.75em;
+	line-height: 1;
+	color: #72777d;
 }
 
-/* Reveal icon when hovering the heading */
-h2:hover .paragraphlinks-icon,
-h3:hover .paragraphlinks-icon,
-h4:hover .paragraphlinks-icon,
-h5:hover .paragraphlinks-icon,
-h6:hover .paragraphlinks-icon {
-    opacity: 1;
+/* Reveal the icon when hovering a content heading */
+#mw-content-text h2:hover .paragraphlinks-icon,
+#mw-content-text h3:hover .paragraphlinks-icon,
+#mw-content-text h4:hover .paragraphlinks-icon,
+#mw-content-text h5:hover .paragraphlinks-icon,
+#mw-content-text h6:hover .paragraphlinks-icon {
+	opacity: 1;
 }
 
-/* Icon hover state */
+/* Suppress underline on icon hover */
 .paragraphlinks-icon:hover {
-    text-decoration: none;
+	text-decoration: none;
 }
