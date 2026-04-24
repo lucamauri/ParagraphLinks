@@ -309,3 +309,243 @@ Allowing logged-in users to disable the icons via `Special:Preferences` (using `
 | 6. Documentation | 4 issues found |
 | 7. Suggested improvements | 10 suggestions |
 | **Total defects** | **17** |
+
+---
+
+## Post-refactor Assessment – 2026-04-24
+
+**Branch:** `php84-compat`  
+**Auditor:** Claude Code (claude-sonnet-4-6)  
+**Commits reviewed:** `0a37b4e` (PHP/extension.json/i18n modernisation), `2b5232e` (JS/CSS), `b472bc2` (test suite modernisation), `245f859` (docs)
+
+---
+
+### 1. PHP code
+
+> **Critical blocker found before individual checks can be validated.** Commit `b472bc2` ("fix: modernize test suite") accidentally wrote the new test-class content into `includes/ParagraphLinksHooks.php` instead of `tests/phpunit/ParagraphLinksHooksTest.php`. The correct hook class — which was properly implemented in the preceding commit `0a37b4e` — was overwritten and is no longer present in the repository. `includes/ParagraphLinksHooks.php` currently contains `class ParagraphLinksHooksTest extends MediaWikiIntegrationTestCase`, not `class ParagraphLinksHooks implements BeforePageDisplayHook`. The extension cannot load in this state.
+
+The individual checks below are evaluated against the **intended** post-refactor state (as implemented in `0a37b4e`, before the accidental overwrite), with a note on actual on-disk status.
+
+| Check | Intended state (0a37b4e) | Actual on-disk state |
+|---|---|---|
+| Implements `BeforePageDisplayHook` | PASS | **FAIL** — class is missing |
+| Constructor injects `Config` | PASS | **FAIL** — class is missing |
+| No `MediaWikiServices::getInstance()` calls | PASS | **FAIL** — class is missing |
+| Type declarations on hook method (`OutputPage $out, Skin $skin): void`) | PASS | **FAIL** — class is missing |
+| Null guard on `$out->getTitle()` | PASS | **FAIL** — class is missing |
+| No `LoggerFactory` calls | PASS | **FAIL** — class is missing |
+| `@license GPL-2.0-or-later` | PASS | **FAIL** — class is missing |
+
+The hook class as written in `0a37b4e` (recoverable via `git show 0a37b4e:includes/ParagraphLinksHooks.php`) correctly addresses every item from the original audit. The sole remaining task is to restore that file.
+
+---
+
+### 2. extension.json
+
+| Check | Result |
+|---|---|
+| `AutoloadNamespaces` used instead of `AutoloadClasses` | **PASS** |
+| `HookHandlers` block present and correctly wired (`class`, `services: ["MainConfig"]`) | **PASS** |
+| `Hooks` block references handler by key name (`"BeforePageDisplay": "ParagraphLinksHookHandler"`) | **PASS** |
+| `mediawiki.util` absent from ResourceModule dependencies | **PASS** |
+| `requires.platform.php` present (`>= 7.4`) | **PASS** |
+| `descriptionmsg` used for extension and both config variables | **PASS** |
+| License is `GPL-2.0-or-later` | **PASS** |
+
+All seven `extension.json` checks pass.
+
+---
+
+### 3. JavaScript
+
+| Check | Result |
+|---|---|
+| `aria-label` uses `mw.msg( 'paragraphlinks-copy-link' )` | **PASS** |
+| `title` attribute uses `mw.msg( 'paragraphlinks-copy-link' )` | **PASS** |
+| Success notification uses `mw.msg( 'paragraphlinks-copied' )` | **PASS** |
+| `@license GPL-2.0-or-later` | **PASS** |
+
+All JavaScript checks pass.
+
+---
+
+### 4. CSS
+
+| Check | Result |
+|---|---|
+| `position: relative` rule scoped to `#mw-content-text h2…h6` | **PASS** |
+| Hover-reveal selectors scoped to `#mw-content-text h2:hover…h6:hover` | **PASS** |
+
+All CSS checks pass.
+
+---
+
+### 5. i18n
+
+| Check | en.json | it.json | qqq.json |
+|---|---|---|---|
+| `paragraphlinks-desc` present | **PASS** | **PASS** | **PASS** |
+| `paragraphlinks-config-enabled` present | **PASS** | **PASS** | **PASS** |
+| `paragraphlinks-config-namespaces` present | **PASS** | **PASS** | **PASS** |
+| User-visible strings free of the word "paragraph" (replaced with "section") | **PASS** | **PASS** | N/A |
+
+All i18n checks pass. Every user-visible string in `en.json` and `it.json` uses "section" rather than "paragraph". The `qqq.json` descriptions now include full translator context (role of the string, attribute type, expected phrase length).
+
+---
+
+### 6. Test suite
+
+| Check | Result |
+|---|---|
+| `Title::` static factory calls gone | **FAIL** — `Title::newMainPage()` (×2) and `Title::makeTitle()` (×1) still present in `tests/phpunit/ParagraphLinksHooksTest.php` |
+| `SpecialPage::` static factory calls gone | **FAIL** — `SpecialPage::getTitleFor( 'Version' )` still present |
+| `makeHandler()` helper present and used in all five test methods | **FAIL** — helper is absent from `tests/phpunit/ParagraphLinksHooksTest.php` |
+| `@covers` annotations use fully-qualified class name | **FAIL** — annotations read `@covers ParagraphLinksHooks` (no namespace) |
+
+All four test-suite checks fail. The intended new test content (with `makeHandler()`, `getServiceContainer()->getTitleFactory()`, `getServiceContainer()->getSpecialPageFactory()`, and `@covers \MediaWiki\Extension\ParagraphLinks\ParagraphLinksHooks`) was accidentally committed to `includes/ParagraphLinksHooks.php` rather than `tests/phpunit/ParagraphLinksHooksTest.php`.
+
+---
+
+### 7. New issues
+
+#### 7.1 Critical: file-swap regression in commit `b472bc2` (blocker)
+
+Commit `b472bc2` performed a write to the wrong path. The diff shows that the body of the new `ParagraphLinksHooksTest` class was committed into `includes/ParagraphLinksHooks.php`, completely replacing the `ParagraphLinksHooks` hook class that had been correctly implemented two commits earlier. `tests/phpunit/ParagraphLinksHooksTest.php` was never touched.
+
+**Consequence:** The extension is non-functional. `AutoloadNamespaces` maps `MediaWiki\Extension\ParagraphLinks\` to `includes/`, so PHP will attempt to load `ParagraphLinksHooksTest` when the hook handler is instantiated. The `HookHandlers` wiring in `extension.json` references the missing class, causing a fatal error on every page load.
+
+**Fix:** Two files need to be set to their correct content:
+- `includes/ParagraphLinksHooks.php` → restore the hook class from `git show 0a37b4e:includes/ParagraphLinksHooks.php`
+- `tests/phpunit/ParagraphLinksHooksTest.php` → replace with the new test content currently sitting at `includes/ParagraphLinksHooks.php`
+
+#### 7.2 Minor: `testOnBeforePageDisplayDisabled` skips the null guard path
+
+In the disabled-extension test (`testOnBeforePageDisplayDisabled`), no `OutputPage::getTitle()` mock is set up. This is correct for the short-circuit path (the handler returns before calling `getTitle()`), but the test will produce a PHPUnit warning about unexpected mock method calls if the code path is ever reordered. Not a blocker; worth noting for robustness.
+
+---
+
+### Overall verdict
+
+**Extension is NOT ready to merge to main.**
+
+All `extension.json`, JavaScript, CSS, and i18n changes are correctly implemented and pass every check. However, commit `b472bc2` introduced a file-swap regression that makes the extension non-functional: the hook class (`includes/ParagraphLinksHooks.php`) was overwritten with test-class content, and the test file (`tests/phpunit/ParagraphLinksHooksTest.php`) was never updated. Both files must be corrected before the branch can be merged.
+
+---
+
+## Post-refactor Assessment – 2026-04-24 (Second pass, post-fix)
+
+**Branch:** `php84-compat`  
+**Auditor:** Claude Code (claude-sonnet-4-6)  
+**Purpose:** Re-verify that the file-swap regression identified in the first-pass assessment has been resolved and all original refactor goals are met in the current working tree.
+
+---
+
+### 1. PHP code
+
+| Check | Result |
+|---|---|
+| Implements `BeforePageDisplayHook` | **PASS** — `class ParagraphLinksHooks implements BeforePageDisplayHook` (line 24) |
+| Constructor injects `Config` | **PASS** — `__construct( Config $config )` assigns to `$this->config` (lines 32–34) |
+| No `MediaWikiServices::getInstance()` calls | **PASS** — none present |
+| Type declarations on hook method | **PASS** — `onBeforePageDisplay( OutputPage $out, Skin $skin ): void` (line 43) |
+| Null guard on `$out->getTitle()` | **PASS** — `if ( $title === null ) { return; }` (lines 50–52) |
+| No `LoggerFactory` calls | **PASS** — none present |
+| `@license GPL-2.0-or-later` | **PASS** — line 8 |
+
+All seven PHP checks pass.
+
+---
+
+### 2. extension.json
+
+| Check | Result |
+|---|---|
+| `AutoloadNamespaces` used instead of `AutoloadClasses` | **PASS** — lines 41–43 |
+| `HookHandlers` block present and correctly wired (`class`, `services: ["MainConfig"]`) | **PASS** — lines 32–36 |
+| `Hooks` block references handler by key name (`"BeforePageDisplay": "ParagraphLinksHookHandler"`) | **PASS** — lines 38–40 |
+| `mediawiki.util` absent from ResourceModule dependencies | **PASS** — no `dependencies` key; module lists only `scripts`, `styles`, `messages` |
+| `requires.platform.php` present | **PASS** — `">= 7.4"` at lines 12–14 |
+| `descriptionmsg` used for extension and both config variables | **PASS** — line 6 and config entries at lines 46, 50 |
+| License is `GPL-2.0-or-later` | **PASS** — line 7 |
+
+All seven `extension.json` checks pass.
+
+---
+
+### 3. JavaScript
+
+| Check | Result |
+|---|---|
+| `aria-label` uses `mw.msg( 'paragraphlinks-copy-link' )` | **PASS** — line 34 |
+| `title` attribute uses `mw.msg( 'paragraphlinks-copy-link' )` | **PASS** — line 35 |
+| Success notification uses `mw.msg( 'paragraphlinks-copied' )` | **PASS** — line 46 |
+| Error notification uses `mw.msg( 'paragraphlinks-copy-failed' )` | **PASS** — line 53 |
+| `@license GPL-2.0-or-later` | **PASS** — line 4 |
+
+All JavaScript checks pass.
+
+---
+
+### 4. CSS
+
+| Check | Result |
+|---|---|
+| `position: relative` rule scoped to `#mw-content-text h2…h6` | **PASS** — lines 2–8 |
+| Hover-reveal selectors scoped to `#mw-content-text h2:hover…h6:hover .paragraphlinks-icon` | **PASS** — lines 25–30 |
+
+Both CSS checks pass.
+
+---
+
+### 5. i18n
+
+| Check | en.json | it.json | qqq.json |
+|---|---|---|---|
+| `paragraphlinks-desc` present | **PASS** | **PASS** | **PASS** |
+| `paragraphlinks-config-enabled` present | **PASS** | **PASS** | **PASS** |
+| `paragraphlinks-config-namespaces` present | **PASS** | **PASS** | **PASS** |
+| User-visible strings use "section" not "paragraph" | **PASS** | **PASS** | N/A |
+
+All i18n checks pass. Every user-facing value in `en.json` and `it.json` uses "section" or "heading" terminology; the word "paragraph" appears only in the extension/key names (proper nouns), which is expected.
+
+---
+
+### 6. Test suite
+
+| Check | Result |
+|---|---|
+| `Title::` static factory calls gone | **PASS** — replaced with `$this->getServiceContainer()->getTitleFactory()->newMainPage()` (lines 35, 93) and `->makeTitle()` (line 72) |
+| `SpecialPage::` static factory calls gone | **PASS** — replaced with `$this->getServiceContainer()->getSpecialPageFactory()->getTitleForAlias()` (line 114) |
+| `makeHandler()` helper present and used in all five test methods | **PASS** — defined at line 20; called at lines 45, 60, 81, 102, 123 |
+| `@covers` annotation uses fully-qualified class name | **PASS** — class-level annotation reads `@covers \MediaWiki\Extension\ParagraphLinks\ParagraphLinksHooks` (line 8); per-method annotations also use the FQCN (lines 27, 49, 64, 85, 106) |
+
+All four test-suite checks pass.
+
+---
+
+### 7. New issues
+
+#### 7.1 Minor: no `mediawiki.notification` dependency declared (advisory only)
+
+`ext.paragraphlinks.js` calls `mw.notify()`, which is provided by the `mediawiki.notification` ResourceLoader module. The ResourceModule in `extension.json` declares no `dependencies` at all (the formerly unused `mediawiki.util` was correctly removed). In practice `mediawiki.notification` is loaded on every standard page view and the calls will work, but strict ResourceLoader correctness requires listing the module as an explicit dependency:
+
+```json
+"dependencies": ["mediawiki.notification"]
+```
+
+This is advisory — it will not cause failures on any standard wiki — but it should be addressed before submitting to the MediaWiki extension registry.
+
+#### 7.2 Carry-forward minor: `testOnBeforePageDisplayDisabled` has no `getTitle()` mock expectation
+
+Noted in the first-pass assessment (§7.2). The test correctly omits a `getTitle()` setup because the disabled-branch exits before that call, but PHPUnit will emit an unexpected-interaction warning if the code path is ever reordered. Not a blocker; the behaviour is intentional.
+
+No regressions were introduced by fixing the file-swap. No issues from the original audit remain unresolved except the two advisory items above.
+
+---
+
+### Overall verdict
+
+**All blocking checks passed — extension is ready to merge to main**, subject to the following optional improvements:
+
+1. **Advisory:** Add `"dependencies": ["mediawiki.notification"]` to the `ext.paragraphlinks` ResourceModule in `extension.json` for strict ResourceLoader correctness.
+2. **Advisory:** Consider adding a `getTitle()` mock expectation (or an explicit comment explaining its absence) in `testOnBeforePageDisplayDisabled` for future robustness.

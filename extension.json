@@ -19,6 +19,7 @@
       "remoteExtPath": "ParagraphLinks/resources",
       "scripts": ["ext.paragraphlinks.js"],
       "styles": ["ext.paragraphlinks.css"],
+      "dependencies": ["mediawiki.notification"],
       "messages": [
         "paragraphlinks-copy-link",
         "paragraphlinks-copied",
