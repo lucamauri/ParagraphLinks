@@ -2,7 +2,10 @@
   "@metadata": {
     "authors": ["Luca Mauri"]
   },
-  "paragraphlinks-copy-link": "Copia link a questo paragrafo",
+  "paragraphlinks-desc": "Aggiunge icone di collegamento al passaggio del mouse sulle intestazioni di sezione per copiare facilmente link diretti a sezioni specifiche nelle pagine wiki",
+  "paragraphlinks-config-enabled": "Abilita o disabilita globalmente l'estensione ParagraphLinks",
+  "paragraphlinks-config-namespaces": "Elenco degli indici di namespace in cui le icone di collegamento alle intestazioni sono attive",
+  "paragraphlinks-copy-link": "Copia link a questa sezione",
   "paragraphlinks-copied": "Link copiato negli appunti!",
   "paragraphlinks-copy-failed": "Impossibile copiare il link, riprovare."
 }

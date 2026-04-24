@@ -2,7 +2,10 @@
   "@metadata": {
     "authors": ["Luca Mauri"]
   },
-  "paragraphlinks-copy-link": "Message documentation for copy link tooltip",
-  "paragraphlinks-copied": "Success message when link is copied to clipboard",
-  "paragraphlinks-copy-failed": "Error message when copying fails"
+  "paragraphlinks-desc": "Short description of the ParagraphLinks extension, shown on Special:Version",
+  "paragraphlinks-config-enabled": "Description of the ParagraphLinksEnabled configuration variable, shown in configuration documentation",
+  "paragraphlinks-config-namespaces": "Description of the ParagraphLinksNamespaces configuration variable, shown in configuration documentation",
+  "paragraphlinks-copy-link": "Tooltip text used as the aria-label and title attribute of the 🔗 icon that appears on hover next to each section heading. Should be a short imperative phrase.",
+  "paragraphlinks-copied": "Success notification shown to the user after the section link URL has been successfully copied to the clipboard",
+  "paragraphlinks-copy-failed": "Error notification shown to the user when the clipboard copy operation fails"
 }
