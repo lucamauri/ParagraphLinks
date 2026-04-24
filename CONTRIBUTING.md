@@ -18,7 +18,7 @@ Thank you for your interest in contributing to the ParagraphLinks MediaWiki exte
 1. **Clone the repository:**
    ```bash
    cd /path/to/mediawiki/extensions/
-   git clone https://github.com/yourusername/mediawiki-extension-paragraphlinks.git ParagraphLinks
+   git clone https://github.com/lucamauri/ParagraphLinks.git ParagraphLinks
    cd ParagraphLinks
    ```
 
@@ -31,7 +31,7 @@ Thank you for your interest in contributing to the ParagraphLinks MediaWiki exte
    Add to your `LocalSettings.php`:
    ```php
    wfLoadExtension( 'ParagraphLinks' );
-   
+
    // Development settings
    $wgShowExceptionDetails = true;
    $wgDevelopmentWarnings = true;
@@ -39,10 +39,7 @@ Thank you for your interest in contributing to the ParagraphLinks MediaWiki exte
    $wgCacheDirectory = false;
    ```
 
-4. **Run MediaWiki update:**
-   ```bash
-   php /path/to/mediawiki/maintenance/update.php
-   ```
+> **Note:** No database update is required. Do not run `maintenance/update.php` for this extension.
 
 ## Code Standards
 
@@ -124,15 +121,13 @@ npm run lint:fix
 
 ### Commit Message Format
 
-Use clear, descriptive commit messages:
+Use clear, descriptive commit messages following the conventional commits format:
 
 ```
-Add hover link icons to paragraphs
+fix: correct heading selector scope in CSS
 
-- Implement automatic anchor generation
-- Add clipboard integration with fallback
-- Include mobile touch support
-- Add accessibility features
+- Scope position:relative to #mw-content-text headings only
+- Prevent icon styles from leaking into sidebar and skin chrome
 
 Fixes #123
 ```
@@ -159,7 +154,7 @@ Fixes #123
 - Sanitize all generated HTML content
 - Use secure clipboard APIs when available
 - Follow MediaWiki security best practices
-- Report security issues privately
+- Report security issues privately via the GitHub issue tracker
 
 ## Accessibility Requirements
 
@@ -183,7 +178,6 @@ Fixes #123
 - Add inline code comments for complex logic
 - Update configuration documentation
 - Include examples in documentation
-- Keep changelog updated
 
 ## Issue Reporting
 
@@ -210,17 +204,15 @@ For feature requests, please include:
 
 ## Release Process
 
-1. Update version numbers in `extension.json` and `package.json`
-2. Update `CHANGELOG.md` with release notes
-3. Create a GitHub release with tag
-4. Update MediaWiki extension registry (if applicable)
+1. Update the version number in `extension.json`
+2. Create a GitHub release with a tag and release notes
+3. Update the MediaWiki extension registry if applicable
 
 ## Getting Help
 
 - Create an issue on GitHub for questions
 - Check existing issues and documentation first
 - Provide context and examples when asking questions
-- Be patient and respectful
 
 ## License
 
