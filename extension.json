@@ -1,14 +1,17 @@
 {
   "name": "ParagraphLinks",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": ["Luca Mauri"],
   "url": "https://github.com/lucamauri/ParagraphLinks",
-  "description": "Adds hover link icons to paragraphs for easy copying of direct links to specific content within wiki pages",
-  "license-name": "GPL-3.0-or-later",
+  "descriptionmsg": "paragraphlinks-desc",
+  "license-name": "GPL-2.0-or-later",
   "type": "other",
   "manifest_version": 2,
   "requires": {
-    "MediaWiki": ">= 1.35.0"
+    "MediaWiki": ">= 1.35.0",
+    "platform": {
+      "php": ">= 7.4"
+    }
   },
   "ResourceModules": {
     "ext.paragraphlinks": {
@@ -16,7 +19,7 @@
       "remoteExtPath": "ParagraphLinks/resources",
       "scripts": ["ext.paragraphlinks.js"],
       "styles": ["ext.paragraphlinks.css"],
-      "dependencies": ["mediawiki.util"],
+      "dependencies": ["mediawiki.notification"],
       "messages": [
         "paragraphlinks-copy-link",
         "paragraphlinks-copied",
@@ -27,20 +30,26 @@
   "MessagesDirs": {
     "ParagraphLinks": ["i18n"]
   },
-  "Hooks": {
-    "BeforePageDisplay": "MediaWiki\\Extension\\ParagraphLinks\\ParagraphLinksHooks::onBeforePageDisplay"
+  "HookHandlers": {
+    "ParagraphLinksHookHandler": {
+      "class": "MediaWiki\\Extension\\ParagraphLinks\\ParagraphLinksHooks",
+      "services": ["MainConfig"]
+    }
   },
-  "AutoloadClasses": {
-    "MediaWiki\\Extension\\ParagraphLinks\\ParagraphLinksHooks": "includes/ParagraphLinksHooks.php"
+  "Hooks": {
+    "BeforePageDisplay": "ParagraphLinksHookHandler"
+  },
+  "AutoloadNamespaces": {
+    "MediaWiki\\Extension\\ParagraphLinks\\": "includes/"
   },
   "config": {
     "ParagraphLinksEnabled": {
       "value": true,
-      "description": "Enable paragraph links functionality"
+      "descriptionmsg": "paragraphlinks-config-enabled"
     },
     "ParagraphLinksNamespaces": {
       "value": [0, 4, 10, 12, 14],
-      "description": "Namespaces where paragraph links are enabled (Main, Project, Template, Help, Category by default)"
+      "descriptionmsg": "paragraphlinks-config-namespaces"
     }
   }
 }

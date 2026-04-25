@@ -5,12 +5,26 @@
  *
  * @group Extensions
  * @group ParagraphLinks
- * @covers ParagraphLinksHooks
+ * @covers \MediaWiki\Extension\ParagraphLinks\ParagraphLinksHooks
  */
 class ParagraphLinksHooksTest extends MediaWikiIntegrationTestCase {
 
 	/**
-	 * @covers ParagraphLinksHooks::onBeforePageDisplay
+	 * Instantiate the hook handler with the current (possibly overridden) MainConfig.
+	 *
+	 * Must be called AFTER overrideConfigValues() so that the injected config
+	 * already reflects the test-specific values.
+	 *
+	 * @return \MediaWiki\Extension\ParagraphLinks\ParagraphLinksHooks
+	 */
+	private function makeHandler(): \MediaWiki\Extension\ParagraphLinks\ParagraphLinksHooks {
+		return new \MediaWiki\Extension\ParagraphLinks\ParagraphLinksHooks(
+			$this->getServiceContainer()->getMainConfig()
+		);
+	}
+
+	/**
+	 * @covers \MediaWiki\Extension\ParagraphLinks\ParagraphLinksHooks::onBeforePageDisplay
 	 */
 	public function testOnBeforePageDisplayEnabled() {
 		$this->overrideConfigValues( [
@@ -18,21 +32,21 @@ class ParagraphLinksHooksTest extends MediaWikiIntegrationTestCase {
 			'ParagraphLinksNamespaces' => [ NS_MAIN ]
 		] );
 
-		$outputPage = $this->createMock( OutputPage::class );
-		$skin = $this->createMock( Skin::class );
-		$title = Title::newMainPage();
+		$title = $this->getServiceContainer()->getTitleFactory()->newMainPage();
 		$request = new FauxRequest();
 
+		$outputPage = $this->createMock( OutputPage::class );
+		$skin = $this->createMock( Skin::class );
 		$outputPage->method( 'getTitle' )->willReturn( $title );
 		$outputPage->method( 'getRequest' )->willReturn( $request );
 		$outputPage->expects( $this->once() )->method( 'addModules' )
 			->with( 'ext.paragraphlinks' );
 
-		ParagraphLinksHooks::onBeforePageDisplay( $outputPage, $skin );
+		$this->makeHandler()->onBeforePageDisplay( $outputPage, $skin );
 	}
 
 	/**
-	 * @covers ParagraphLinksHooks::onBeforePageDisplay
+	 * @covers \MediaWiki\Extension\ParagraphLinks\ParagraphLinksHooks::onBeforePageDisplay
 	 */
 	public function testOnBeforePageDisplayDisabled() {
 		$this->overrideConfigValues( [
@@ -41,14 +55,15 @@ class ParagraphLinksHooksTest extends MediaWikiIntegrationTestCase {
 
 		$outputPage = $this->createMock( OutputPage::class );
 		$skin = $this->createMock( Skin::class );
-
+		// No getTitle() mock needed — the handler exits before reaching that call
+		// when the extension is globally disabled.
 		$outputPage->expects( $this->never() )->method( 'addModules' );
 
-		ParagraphLinksHooks::onBeforePageDisplay( $outputPage, $skin );
+		$this->makeHandler()->onBeforePageDisplay( $outputPage, $skin );
 	}
 
 	/**
-	 * @covers ParagraphLinksHooks::onBeforePageDisplay
+	 * @covers \MediaWiki\Extension\ParagraphLinks\ParagraphLinksHooks::onBeforePageDisplay
 	 */
 	public function testOnBeforePageDisplayWrongNamespace() {
 		$this->overrideConfigValues( [
@@ -56,20 +71,20 @@ class ParagraphLinksHooksTest extends MediaWikiIntegrationTestCase {
 			'ParagraphLinksNamespaces' => [ NS_MAIN ]
 		] );
 
-		$outputPage = $this->createMock( OutputPage::class );
-		$skin = $this->createMock( Skin::class );
-		$title = Title::makeTitle( NS_USER, 'TestUser' );
+		$title = $this->getServiceContainer()->getTitleFactory()->makeTitle( NS_USER, 'TestUser' );
 		$request = new FauxRequest();
 
+		$outputPage = $this->createMock( OutputPage::class );
+		$skin = $this->createMock( Skin::class );
 		$outputPage->method( 'getTitle' )->willReturn( $title );
 		$outputPage->method( 'getRequest' )->willReturn( $request );
 		$outputPage->expects( $this->never() )->method( 'addModules' );
 
-		ParagraphLinksHooks::onBeforePageDisplay( $outputPage, $skin );
+		$this->makeHandler()->onBeforePageDisplay( $outputPage, $skin );
 	}
 
 	/**
-	 * @covers ParagraphLinksHooks::onBeforePageDisplay
+	 * @covers \MediaWiki\Extension\ParagraphLinks\ParagraphLinksHooks::onBeforePageDisplay
 	 */
 	public function testOnBeforePageDisplayEditAction() {
 		$this->overrideConfigValues( [
@@ -77,20 +92,20 @@ class ParagraphLinksHooksTest extends MediaWikiIntegrationTestCase {
 			'ParagraphLinksNamespaces' => [ NS_MAIN ]
 		] );
 
-		$outputPage = $this->createMock( OutputPage::class );
-		$skin = $this->createMock( Skin::class );
-		$title = Title::newMainPage();
+		$title = $this->getServiceContainer()->getTitleFactory()->newMainPage();
 		$request = new FauxRequest( [ 'action' => 'edit' ] );
 
+		$outputPage = $this->createMock( OutputPage::class );
+		$skin = $this->createMock( Skin::class );
 		$outputPage->method( 'getTitle' )->willReturn( $title );
 		$outputPage->method( 'getRequest' )->willReturn( $request );
 		$outputPage->expects( $this->never() )->method( 'addModules' );
 
-		ParagraphLinksHooks::onBeforePageDisplay( $outputPage, $skin );
+		$this->makeHandler()->onBeforePageDisplay( $outputPage, $skin );
 	}
 
 	/**
-	 * @covers ParagraphLinksHooks::onBeforePageDisplay
+	 * @covers \MediaWiki\Extension\ParagraphLinks\ParagraphLinksHooks::onBeforePageDisplay
 	 */
 	public function testOnBeforePageDisplaySpecialPage() {
 		$this->overrideConfigValues( [
@@ -98,15 +113,15 @@ class ParagraphLinksHooksTest extends MediaWikiIntegrationTestCase {
 			'ParagraphLinksNamespaces' => [ NS_SPECIAL ]
 		] );
 
-		$outputPage = $this->createMock( OutputPage::class );
-		$skin = $this->createMock( Skin::class );
-		$title = SpecialPage::getTitleFor( 'Version' );
+		$title = $this->getServiceContainer()->getSpecialPageFactory()->getTitleForAlias( 'Version' );
 		$request = new FauxRequest();
 
+		$outputPage = $this->createMock( OutputPage::class );
+		$skin = $this->createMock( Skin::class );
 		$outputPage->method( 'getTitle' )->willReturn( $title );
 		$outputPage->method( 'getRequest' )->willReturn( $request );
 		$outputPage->expects( $this->never() )->method( 'addModules' );
 
-		ParagraphLinksHooks::onBeforePageDisplay( $outputPage, $skin );
+		$this->makeHandler()->onBeforePageDisplay( $outputPage, $skin );
 	}
 }
