@@ -12,8 +12,6 @@ namespace MediaWiki\Extension\ParagraphLinks;
 
 use MediaWiki\Config\Config;
 use MediaWiki\Hook\BeforePageDisplayHook;
-use MediaWiki\Output\OutputPage;
-use MediaWiki\Skins\Skin;
 
 /**
  * Hook handler for the ParagraphLinks extension.
@@ -40,7 +38,7 @@ class ParagraphLinksHooks implements BeforePageDisplayHook {
 	 * @param OutputPage $out
 	 * @param Skin $skin
 	 */
-	public function onBeforePageDisplay( OutputPage $out, Skin $skin ): void {
+	public function onBeforePageDisplay( $out, $skin ): void {
 		// Check if the extension is globally enabled
 		if ( !$this->config->get( 'ParagraphLinksEnabled' ) ) {
 			return;
